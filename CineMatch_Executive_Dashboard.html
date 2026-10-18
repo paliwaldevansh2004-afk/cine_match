@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch - Power BI Executive Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0F172A; color: #F8FAFC; padding: 25px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #1E293B; padding-bottom: 15px; }
+        .title-box h1 { font-size: 26px; font-weight: 800; background: linear-gradient(90deg, #F59E0B, #EF4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .title-box p { font-size: 13px; color: #94A3B8; margin-top: 4px; }
+        .badge { background: #1E293B; color: #38BDF8; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #334155; }
+        
+        .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: #1E293B; border-radius: 12px; padding: 18px; border: 1px solid #334155; text-align: center; }
+        .kpi-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; font-weight: 700; margin-bottom: 6px; }
+        .kpi-value { font-size: 26px; font-weight: 800; color: #F8FAFC; }
+        .kpi-sub { font-size: 11px; color: #10B981; margin-top: 4px; }
+
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .chart-card { background: #1E293B; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+        .chart-header { font-size: 15px; font-weight: 700; margin-bottom: 15px; color: #E2E8F0; display: flex; justify-content: space-between; align-items: center; }
+
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th { background: #0F172A; color: #94A3B8; text-align: left; padding: 10px; font-weight: 600; }
+        td { padding: 10px; border-bottom: 1px solid #334155; color: #CBD5E1; }
+        tr:hover td { background: #273549; }
+        .rating-badge { background: #065F46; color: #6EE7B7; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="title-box">
+            <h1>🎬 CineMatch: Executive Movie Industry Dashboard</h1>
+            <p>Hollywood & Bollywood Box Office Financials, ROI Multipliers & Global Industry Trends (9,091 Titles)</p>
+        </div>
+        <div class="badge">● Live Ready Dashboard</div>
+    </div>
+
+    <!-- 5 KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Total Catalog Movies</div>
+            <div class="kpi-value">9,091</div>
+            <div class="kpi-sub">4,803 HW • 4,288 BW</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Global Box Office Gross</div>
+            <div class="kpi-value">$391.5B</div>
+            <div class="kpi-sub">Verified Box Office</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Net Studio Profit</div>
+            <div class="kpi-value">$260.2B</div>
+            <div class="kpi-sub">Revenue - Budget</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Profit Margin %</div>
+            <div class="kpi-value">66.5%</div>
+            <div class="kpi-sub">Aggregate Industry ROI</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Audience Avg Rating</div>
+            <div class="kpi-value">⭐ 6.05</div>
+            <div class="kpi-sub">Across All Decades</div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <span>🏆 Top 10 Highest Grossing Blockbusters (Box Office vs Budget in $ Million)</span>
+            </div>
+            <div style="height: 320px;">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span>🎭 Box Office Revenue by Genre</span>
+            </div>
+            <div style="height: 320px;">
+                <canvas id="donutChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="bottom-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <span>📅 Industry Evolution: Releases Across Decades</span>
+            </div>
+            <div style="height: 280px;">
+                <canvas id="decadeChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span>💰 Production Budget vs Box Office Revenue ($M)</span>
+            </div>
+            <div style="height: 280px;">
+                <canvas id="scatterChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <span>⭐ All-Time Highest Rated Titles (Minimum 100 Verified Votes)</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Industry</th>
+                    <th>Year</th>
+                    <th>Primary Genre</th>
+                    <th>Director</th>
+                    <th>Votes</th>
+                    <th>IMDb / TMDB Score</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td><strong>The Shawshank Redemption</strong></td>
+                    <td>Hollywood</td>
+                    <td>1994</td>
+                    <td>Drama</td>
+                    <td>Frank Darabont</td>
+                    <td>8,205</td>
+                    <td><span class="rating-badge">⭐ 8.5</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>The Godfather</strong></td>
+                    <td>Hollywood</td>
+                    <td>1972</td>
+                    <td>Drama</td>
+                    <td>Francis Ford Coppola</td>
+                    <td>5,893</td>
+                    <td><span class="rating-badge">⭐ 8.4</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>Spirited Away</strong></td>
+                    <td>Hollywood</td>
+                    <td>2001</td>
+                    <td>Fantasy</td>
+                    <td>Hayao Miyazaki</td>
+                    <td>3,840</td>
+                    <td><span class="rating-badge">⭐ 8.3</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>Pulp Fiction</strong></td>
+                    <td>Hollywood</td>
+                    <td>1994</td>
+                    <td>Thriller</td>
+                    <td>Quentin Tarantino</td>
+                    <td>8,428</td>
+                    <td><span class="rating-badge">⭐ 8.3</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>Fight Club</strong></td>
+                    <td>Hollywood</td>
+                    <td>1999</td>
+                    <td>Drama</td>
+                    <td>David Fincher</td>
+                    <td>9,413</td>
+                    <td><span class="rating-badge">⭐ 8.3</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>Schindler's List</strong></td>
+                    <td>Hollywood</td>
+                    <td>1993</td>
+                    <td>Drama</td>
+                    <td>Steven Spielberg</td>
+                    <td>4,329</td>
+                    <td><span class="rating-badge">⭐ 8.3</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>The Godfather: Part II</strong></td>
+                    <td>Hollywood</td>
+                    <td>1974</td>
+                    <td>Drama</td>
+                    <td>Francis Ford Coppola</td>
+                    <td>3,338</td>
+                    <td><span class="rating-badge">⭐ 8.3</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>Whiplash</strong></td>
+                    <td>Hollywood</td>
+                    <td>2014</td>
+                    <td>Drama</td>
+                    <td>Damien Chazelle</td>
+                    <td>4,254</td>
+                    <td><span class="rating-badge">⭐ 8.3</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>One Flew Over the Cuckoo's Nest</strong></td>
+                    <td>Hollywood</td>
+                    <td>1975</td>
+                    <td>Drama</td>
+                    <td>Miloš Forman</td>
+                    <td>2,919</td>
+                    <td><span class="rating-badge">⭐ 8.2</span></td>
+                </tr>
+    
+                <tr>
+                    <td><strong>The Empire Strikes Back</strong></td>
+                    <td>Hollywood</td>
+                    <td>1980</td>
+                    <td>Adventure</td>
+                    <td>Irvin Kershner</td>
+                    <td>5,879</td>
+                    <td><span class="rating-badge">⭐ 8.2</span></td>
+                </tr>
+    
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // 1. Top 10 Horizontal Bar
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ["Avatar", "Titanic", "The Avengers", "Jurassic World", "Furious 7", "Avengers: Age of Ultron", "Frozen", "Iron Man 3", "Minions", "Captain America: Civil War"],
+                datasets: [
+                    {
+                        label: 'Gross Revenue ($M)',
+                        data: [2788.0, 1845.0, 1519.6, 1513.5, 1506.2, 1405.4, 1274.2, 1215.4, 1156.7, 1153.3],
+                        backgroundColor: '#EF4444'
+                    },
+                    {
+                        label: 'Budget ($M)',
+                        data: [237.0, 200.0, 220.0, 150.0, 190.0, 280.0, 150.0, 200.0, 74.0, 250.0],
+                        backgroundColor: '#3B82F6'
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#94A3B8' } } },
+                scales: {
+                    x: { ticks: { color: '#94A3B8' }, grid: { color: '#334155' } },
+                    y: { ticks: { color: '#E2E8F0', font: { weight: 'bold' } }, grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Genre Donut
+        new Chart(document.getElementById('donutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ["Action", "Adventure", "Drama", "Comedy", "Animation", "Fantasy", "Science Fiction", "Horror"],
+                datasets: [{
+                    data: [91459.1, 70872.3, 54103.4, 53037.1, 29595.2, 17057.2, 16176.3, 13252.1],
+                    backgroundColor: ['#F59E0B', '#EF4444', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4', '#64748B']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { color: '#CBD5E1', boxWidth: 12 } } }
+            }
+        });
+
+        // 3. Decade Chart
+        new Chart(document.getElementById('decadeChart'), {
+            type: 'bar',
+            data: {
+                labels: ["Pre-1970s", "1970s", "1980s", "1990s", "2000s", "2010s"],
+                datasets: [{
+                    label: 'Movie Releases',
+                    data: [698, 754, 954, 1505, 2822, 2355],
+                    backgroundColor: '#38BDF8',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#94A3B8' }, grid: { display: false } },
+                    y: { ticks: { color: '#94A3B8' }, grid: { color: '#334155' } }
+                }
+            }
+        });
+
+        // 4. Scatter Chart
+        new Chart(document.getElementById('scatterChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Top Movies',
+                    data: [{"x": 237.0, "y": 2788.0, "title": "Avatar"}, {"x": 200.0, "y": 1845.0, "title": "Titanic"}, {"x": 220.0, "y": 1519.6, "title": "The Avengers"}, {"x": 150.0, "y": 1513.5, "title": "Jurassic World"}, {"x": 190.0, "y": 1506.2, "title": "Furious 7"}, {"x": 280.0, "y": 1405.4, "title": "Avengers: Age of Ultron"}, {"x": 150.0, "y": 1274.2, "title": "Frozen"}, {"x": 200.0, "y": 1215.4, "title": "Iron Man 3"}, {"x": 74.0, "y": 1156.7, "title": "Minions"}, {"x": 250.0, "y": 1153.3, "title": "Captain America: Civil War"}, {"x": 195.0, "y": 1123.7, "title": "Transformers: Dark of the Moon"}, {"x": 94.0, "y": 1118.9, "title": "The Lord of the Rings: The Return of the King"}, {"x": 200.0, "y": 1108.6, "title": "Skyfall"}, {"x": 210.0, "y": 1091.4, "title": "Transformers: Age of Extinction"}, {"x": 250.0, "y": 1084.9, "title": "The Dark Knight Rises"}, {"x": 200.0, "y": 1067.0, "title": "Toy Story 3"}, {"x": 200.0, "y": 1065.7, "title": "Pirates of the Caribbean: Dead Man's Chest"}, {"x": 380.0, "y": 1045.7, "title": "Pirates of the Caribbean: On Stranger Tides"}, {"x": 200.0, "y": 1025.5, "title": "Alice in Wonderland"}, {"x": 250.0, "y": 1021.1, "title": "The Hobbit: An Unexpected Journey"}, {"x": 185.0, "y": 1004.6, "title": "The Dark Knight"}, {"x": 125.0, "y": 976.5, "title": "Harry Potter and the Philosopher's Stone"}, {"x": 76.0, "y": 970.8, "title": "Despicable Me 2"}, {"x": 175.0, "y": 966.6, "title": "The Jungle Book"}, {"x": 300.0, "y": 961.0, "title": "Pirates of the Caribbean: At World's End"}, {"x": 250.0, "y": 958.4, "title": "The Hobbit: The Desolation of Smaug"}, {"x": 250.0, "y": 956.0, "title": "The Hobbit: The Battle of the Five Armies"}, {"x": 94.0, "y": 940.3, "title": "Finding Nemo"}, {"x": 150.0, "y": 938.2, "title": "Harry Potter and the Order of the Phoenix"}, {"x": 250.0, "y": 934.0, "title": "Harry Potter and the Half-Blood Prince"}, {"x": 79.0, "y": 926.3, "title": "The Lord of the Rings: The Two Towers"}, {"x": 115.0, "y": 924.3, "title": "Star Wars: Episode I - The Phantom Menace"}, {"x": 63.0, "y": 920.1, "title": "Jurassic Park"}, {"x": 150.0, "y": 919.8, "title": "Shrek 2"}, {"x": 150.0, "y": 895.9, "title": "Harry Potter and the Goblet of Fire"}, {"x": 258.0, "y": 890.9, "title": "Spider-Man 3"}, {"x": 90.0, "y": 886.7, "title": "Ice Age: Dawn of the Dinosaurs"}, {"x": 245.0, "y": 880.7, "title": "Spectre"}, {"x": 95.0, "y": 877.2, "title": "Ice Age: Continental Drift"}, {"x": 100.0, "y": 876.7, "title": "Harry Potter and the Chamber of Secrets"}],
+                    backgroundColor: '#10B981',
+                    borderColor: '#059669',
+                    pointRadius: 6,
+                    pointHoverRadius: 9
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                var pt = ctx.raw;
+                                return pt.title + ' (Budget: $' + pt.x + 'M, Revenue: $' + pt.y + 'M)';
+                            }
+                        }
+                    },
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Budget ($M)', color: '#94A3B8' }, ticks: { color: '#94A3B8' }, grid: { color: '#334155' } },
+                    y: { title: { display: true, text: 'Revenue ($M)', color: '#94A3B8' }, ticks: { color: '#94A3B8' }, grid: { color: '#334155' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
